@@ -184,6 +184,12 @@ namespace TP1.API.Data.Repository
 
         public RequeteEvenementDto GetById(int id)
         {
+            var nbParticipations = _context.Participations
+                .AsNoTracking()
+                .Include(e => e.Evenement)
+                .Where(p => p.Evenement.Id == id)
+                .Sum(p => p.NombrePlace);
+            
             var evenement = _context.Evenements
                 .AsNoTracking()
                 .Include(e => e.Ville)
@@ -204,6 +210,7 @@ namespace TP1.API.Data.Repository
                     Prix = evenement.Prix,
                     Ville = evenement.Ville.Nom,
                     Region = evenement.Ville.Region.ToString(),
+                    NbParticipations = nbParticipations,
                     Categories = evenement.Categories.Select(c => c.Nom).ToList()
                 };
             }
