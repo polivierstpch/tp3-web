@@ -92,6 +92,9 @@ export default createStore({
     // async getParticipationsForEvent() {
 
     // },
+    async createParticipation(){
+        
+    },
     // async modifyEvent({ commit }, event) {
 
     // },
