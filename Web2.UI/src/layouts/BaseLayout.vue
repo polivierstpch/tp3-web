@@ -39,7 +39,7 @@ nav a, footer div {
   transition: color 0.2s ease;
 }
 
-nav a.router-link-exact-active {
+nav a.router-link-active {
   color: #ffc000;
 }
 

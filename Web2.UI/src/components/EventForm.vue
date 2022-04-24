@@ -1,12 +1,12 @@
 <template>
-  <form @submit.prevent="soumettreEvent">
+  <form>
     <div>
       <label for="titre"> Titre </label>
       <input
         type="text"
         name="titre"
-        v-model="formEvent.titre"
-        :disabled="!isEditing"
+        :value="evenement.titre"
+        disabled
       />
     </div>
     <div>
@@ -14,8 +14,8 @@
       <input
         type="text"
         name="description"
-        v-model="formEvent.description"
-        :disabled="!isEditing"
+        :value="evenement.description"
+        disabled
       />
     </div>
     <div>
@@ -23,36 +23,34 @@
       <input
         type="text"
         name="organisateur"
-        v-model="formEvent.organisateur"
-        :disabled="!isEditing"
+        :value="evenement.organisateur"
+        disabled
       />
     </div>
     <div>
       <label for="ville">Ville</label>
-      <select name="ville" v-model="villeSelectionnee" :disabled="!isEditing">
+      <select name="ville" v-model="villeSelectionnee" disabled>
         <option v-for="ville in villes" :key="ville.id" :value="ville">
-          {{ option.nom }}
+          {{ ville.nom }}
         </option>
       </select>
+    </div>
+    <div>
       <label for="region">Région</label>
-      <input type="text" name="region" disabled :value="regionSelectionnee" />
+      <input type="text" name="region" disabled :value="afficherRegion(evenement.region)" />
     </div>
     <div>
       <label for="adresseCivique">Adresse civique</label>
       <input
         type="text"
         name="adresseCivique"
-        v-model="formEvent.adresseCivique"
-        :disabled="!isEditing"
+        :value="evenement.adresseCivique"
+        disabled
       />
     </div>
     <div>
       <label for="categories">Catégories</label>
-      <select
-        multiple
-        v-model="categoriesSelectionnnees"
-        :disabled="!isEditing"
-      >
+      <select multiple v-model="categoriesSelectionnees" disabled>
         <option
           v-for="categorie in categories"
           :key="categorie.id"
@@ -64,21 +62,21 @@
     </div>
     <div>
       <label for="dateDebut">Date Début</label>
-      <input type="date" name="dateDebut" v-model="formEvent.periode.debut" :disabled="!isEditing" />
+      <input type="date" name="dateDebut" :value="dateDebutDate" disabled />
+      <input type="time" name="dateDebut" :value="dateDebutHeure" disabled />
     </div>
     <div>
-      <label for="dateFin"></label>
-      <input type="date" name="dateFin" v-model="formEvent.periode.fin" :disabled="!isEditing" />
+      <label for="dateFin">Date fin</label>
+      <input type="date" name="dateFin" :value="dateFin" disabled />
     </div>
     <div>
       <label for="nbParticipations">Nombre de participations enregistrées</label>
-      <input type="text" name="nbParticipations" :value="formEvent.nbParticipations" disabled />
+      <input type="text" name="nbParticipations" :value="evenement.nbParticipations" disabled />
     </div>
     <div>
-      <label for="prix"></label>
-      <input type="text" name="prix" v-model.number="formEvent.prix"  :disabled="!isEditing" />
+      <label for="prix">Prix</label>
+      <input type="text" name="prix" :value="prixEnDollars" disabled />
     </div>
-    <input v-if="isEditing" type="submit" value="Modifier" />
   </form>
 </template>
 
@@ -88,46 +86,76 @@ import { formaterRegion } from "@/services/utils";
 export default {
   name: "EventForm",
   props: {
-    event: {
+    evenement: {
       type: Object,
-      required: true,
+      required: true
     },
-    isEditing: {
-      type: Boolean,
-      required: true,
+    categories: {
+      type: Array,
+      required: true
     },
+    villes: {
+      type: Array,
+      required: true
+    }
   },
   data() {
+    const ville = this.evenement.ville;
+    const categories = this.evenement.categories;
     return {
-      formEvent: this.props.event,
-      villeSelectionnee: this.getSelectedVille(),
-      categoriesSelectionnnees: this.getSelectedCategories(),
-    };
+      villeSelectionnee: this.villes.find(v => v.nom === ville),
+      categoriesSelectionnees: this.categories.filter(c => categories.includes(c.nom)) 
+    }
   },
   methods: {
-    getSelectedVille() {
-      const ville = this.formEvent.ville;
-      return this.villes.find((v) => v.nom === ville);
+    afficherRegion(region) {
+      return formaterRegion(region);
     },
-    getSelectedCategories() {
-      const categories = this.formEvent.categories;
-      return this.categories.filter((c) => categories.includes(c.nom));
+    formaterDate(date) {
+      return `${date.getFullYear()}-${(date.getMonth() + 1).toLocaleString(undefined, {minimumIntegerDigits: 2})}-${date.getDate().toLocaleString(undefined, {minimumIntegerDigits: 2})}`;
     },
-    soumettreEvent() {
-      this.$emit('submit', this.formEvent)
+    formaterHeure(date) {
+      return `${date.getHours().toLocaleString(undefined, {minimumIntegerDigits: 2})}:${date.getMinutes().toLocaleString(undefined, {minimumIntegerDigits: 2})}`;
     }
   },
   computed: {
-    villes() {
-      return this.$store.getters.villes;
+    prixEnDollars() {
+      return `${this.evenement.prix.toFixed(2)} $`;
     },
-    categories() {
-      return this.$store.getters.categories;
+    dateFin() {
+      const date = this.evenement.dateFin;
+      return this.formaterDate(date);
     },
-    regionSelectionnee() {
-      return formaterRegion(this.villeSelectionnee.region);
+    dateDebutDate() {
+      const date = this.evenement.dateDebut;
+      return this.formaterDate(date);
     },
-  },
-  emits: ["submit"],
+    dateDebutHeure() {
+      const date = this.evenement.dateDebut;
+      return this.formaterHeure(date);
+    }
+  }
 };
-</script> 
+</script>
+
+<style scoped>
+label {
+  display: block;
+  font-weight: bold;
+}
+
+form div {
+  margin: 10px 0;
+}
+
+input, select {
+  font-family: inherit;
+  font-size: 1em;
+}
+
+input[disabled], select[disabled] {
+  border: 1px solid #fff;
+  background-color: transparent;
+  color: #fff;
+}
+</style>

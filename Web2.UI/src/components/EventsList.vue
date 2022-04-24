@@ -23,13 +23,14 @@
           </div>
         </td>
         <td>
-          du {{ formaterDate(event.periode.debut) }}
+          du {{ formaterDate(event.dateDebut) }}
           au
-          {{ formaterDate(event.periode.fin) }}
+          {{ formaterDate(event.dateFin) }}
         </td>
         <td>
-          <button>Détails</button>
-          <button>Modifier</button>
+          <button @click="$router.push(`/evenements/${event.id}`)">Détails</button>
+          <!-- <button @click="$router.push(`/evenements/${event.id}`)" >Détails</button> -->
+          <button @click="$router.push({ path: `/evenements/${event.id}`, query: { enEdition: true } })">Modifier</button>
           <button v-if="isAuthenticated" @click="supprimerEvenement(event.id)">Supprimer</button>
         </td>
       </tr>
@@ -76,6 +77,8 @@ export default {
   },
   async mounted() {
     await this.$store.dispatch('getEvents');
+    await this.$store.dispatch('getVilles');
+    await this.$store.dispatch('getCategories');
   }
 };
 </script>

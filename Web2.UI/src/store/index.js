@@ -3,17 +3,23 @@ import httpClient from '../services/httpClient'
 
 export default createStore({
   state: {
+    currentEvent: {},
     events: [],
     participations: [],
     villes: [],
     categories: []
   },
   getters: {
+    currentEvent: state => state.currentEvent,
     events: state => state.events,
     participations: state => state.participations,
-    villes: state => state.villes
+    villes: state => state.villes,
+    categories: state => state.categories
   },
   mutations: {
+    setCurrentEvent(state, payload) {
+      state.currentEvent = payload;
+    },
     setEvents(state, payload) {
       state.events = payload;
     },
@@ -45,15 +51,40 @@ export default createStore({
             adresseCivique: evt.adresseCivique,
             region: evt.region,
             categories: evt.categories,
-            periode: {
-              debut: new Date(evt.dateDebut),
-              fin: new Date(evt.dateFin)
-            },
+            dateDebut: new Date(evt.dateDebut),
+            dateFin: new Date(evt.dateFin),
             nbParticipations: evt.nbParticipations,
             prix: evt.prix
           };
         });
         commit('setEvents', events);
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    async getEventParId({ commit }, id) {
+      try {
+        const response = await httpClient.get(`/api/evenements/${id}`)
+        if(!response.data) return;
+        if (response.status === 404) {
+          throw new Error('Not found');
+        }
+        
+        const event = {
+          id: response.data.id,
+          titre: response.data.titre,
+          description: response.data.description,
+          organisateur: response.data.nomOrganisateur,
+          ville: response.data.ville,
+          adresseCivique: response.data.adresseCivique,
+          region: response.data.region,
+          categories: response.data.categories,
+          dateDebut: new Date(response.data.dateDebut),
+          dateFin: new Date(response.data.dateFin),
+          nbParticipations: response.data.nbParticipations,
+          prix: response.data.prix
+        };
+        commit('setCurrentEvent', event);
       } catch (e) {
         console.log(e);
       }
