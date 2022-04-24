@@ -13,13 +13,14 @@ export default {
   name: 'HomeView',
   methods: {
       isValid(participation){
-          if(this.courriel == !RegExp){
+          const emailRegex = /^[a-zA-Z0-9_!#$%&’*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$/;
+          if(this.courriel == !emailRegex.test(participation.email)){
               return false;
           }
-          if(this.prenom == !RegExp || this.prenom.lenght <3 || this.prenom.lenght > 30){
+          if(this.prenom == !RegExp || this.prenom.length <3 || this.prenom.length > 30){
               return false;
           }
-          if(this.nom == !RegExp || this.nom.lenght <3 || this.nom.lenght > 30){
+          if(this.nom == !RegExp || this.nom.length <3 || this.nom.length > 30){
               return false;
           }
           if(this.nbPlace == 0 || this.nbPlace == null || this.nbPlace < 3 || this.nbPlace > 10){
@@ -31,7 +32,7 @@ export default {
           if(!this.isValid(this.participation)){
               return "Veuillez corriger les erreurs dans le formulaire afin de procéder";
           }
-          const payload = { eventId: $route.params.id, participation };
+          const payload = { eventId: this.$route.params.id, participation };
           this.$store.dispatch("ajouterParticipation", payload);
       }
   }

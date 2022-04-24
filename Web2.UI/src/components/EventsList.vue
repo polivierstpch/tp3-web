@@ -30,7 +30,7 @@
         <td>
           <button @click="$router.push(`/evenements/${event.id}`)">Détails</button>
           <!-- <button @click="$router.push(`/evenements/${event.id}`)" >Détails</button> -->
-          <button @click="$router.push({ path: `/evenements/${event.id}`, query: { enEdition: true } })">Modifier</button>
+          <button @click="$router.push({ path: `/evenements/${event.id}/participations`})">Modifier</button>
           <button v-if="isAuthenticated" @click="supprimerEvenement(event.id)">Supprimer</button>
         </td>
       </tr>

@@ -17,6 +17,10 @@ const routes = [
         path: ':id', 
         component: () => import('../views/evenements/EventDetailsView.vue'),
       },
+      {
+        path: ':id/participation',
+        component: () => import('../views/ParticipationsView.vue')
+      }
     ]
   },
   {
